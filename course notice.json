@@ -1,0 +1,222 @@
+{
+  "name": "course notice",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "id": "ce57f672-6865-43f9-8ef1-c82b61817def",
+      "meta": {
+        "description": "Waits for a message sent to the bot and is configured to only listen for /present"
+      },
+      "position": [
+        -672,
+        48
+      ],
+      "webhookId": "1b2cecdb-7272-4ab1-b7a2-3a20c8d977e4",
+      "credentials": {
+        "telegramApi": {
+          "id": "FTXAVoQb8MIhbRcW",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful AI assistant with access to my Contact List tool. You assist me in composing and sending an email to my contact. Also add a regards section to the name Mostain Billah"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -464,
+        48
+      ],
+      "id": "7fe3a50c-74f9-4bdc-b2a5-f9be188b17e7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        256
+      ],
+      "id": "9a40d93e-d0a8-441c-805e-5163919b22c7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "hmgmIChGswhoJkhO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "senderName": "Mostain Billah"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        272
+      ],
+      "id": "bedeafbc-1cde-4755-9f9f-8087fdd875e5",
+      "name": "Send a message in Gmail",
+      "webhookId": "4a84c0a1-4022-4632-8174-846ac25f993f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rcUfgN60bWO5WrDJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        48
+      ],
+      "id": "6dc440e4-1d7c-498e-80c4-3551bda4aa53",
+      "name": "Send a text message",
+      "webhookId": "33357298-4dab-4331-aa94-9efca0c53f5b",
+      "credentials": {
+        "telegramApi": {
+          "id": "FTXAVoQb8MIhbRcW",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1vgx3hAFjOAy61R__vPRR5el4YBE4rXGG4RqUAdLUfac",
+          "mode": "list",
+          "cachedResultName": "Contact",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vgx3hAFjOAy61R__vPRR5el4YBE4rXGG4RqUAdLUfac/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vgx3hAFjOAy61R__vPRR5el4YBE4rXGG4RqUAdLUfac/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -416,
+        288
+      ],
+      "id": "d69dcea6-13ce-4c4f-be98-309c4dbb155e",
+      "name": "Contact List",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JOM2hvN7VYlO4kJa",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact List": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c0aa771f-d77b-44ea-a315-0fbbf8ca4a4b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef56d8f204f2c0e06a0350d3f573694dcd792155e858bde99b42ab345ba6c13d"
+  },
+  "id": "7V5JenpWrjhe5Lzh",
+  "tags": []
+}
